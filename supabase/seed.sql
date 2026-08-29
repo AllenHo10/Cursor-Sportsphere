@@ -1,0 +1,2 @@
+-- SportSphere dev seed
+-- Requires auth.users rows first; create test users via Supabase Auth before seeding teams.
