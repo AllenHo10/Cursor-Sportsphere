@@ -44,8 +44,11 @@ export default async function DashboardPage() {
           <Button asChild variant="outline">
             <Link href="/profile">Edit profile</Link>
           </Button>
-          <Button asChild>
+          <Button asChild variant="outline">
             <Link href="/teams">Manage teams</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/teams/discover">Discover teams</Link>
           </Button>
         </div>
       </section>

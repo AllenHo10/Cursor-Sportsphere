@@ -69,7 +69,10 @@ export default async function TeamsPage() {
             Create and manage your volleyball teams.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/teams/discover">Discover teams</Link>
+          </Button>
           <Button asChild>
             <Link href="/teams/new">Create team</Link>
           </Button>

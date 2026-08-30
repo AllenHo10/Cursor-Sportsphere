@@ -12,6 +12,8 @@ export const TEAM_TYPES: { value: TeamType; label: string }[] = [
 
 export const DEFAULT_TEAM_SPORT = "volleyball";
 
+export const TEAM_SPORTS = [{ value: "volleyball", label: "Volleyball" }] as const;
+
 export const TEAM_LOGO_BUCKET = "team-logos";
 
 export const TEAM_LOGO_MAX_BYTES = 5 * 1024 * 1024;
