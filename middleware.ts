@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/teams"];
+const PROTECTED_PREFIXES = ["/dashboard", "/teams", "/profile"];
 
 const AUTH_ROUTES = ["/login", "/signup"];
 

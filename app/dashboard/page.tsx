@@ -14,8 +14,13 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const name =
-    (user.user_metadata?.name as string | undefined) ?? user.email ?? "Player";
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("name")
+    .eq("id", user.id)
+    .single();
+
+  const name = profile?.name ?? user.email ?? "Player";
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -35,9 +40,14 @@ export default async function DashboardPage() {
         <p className="mb-4 text-sm text-muted-foreground">
           Manage your teams and matches from here.
         </p>
-        <Button asChild>
-          <Link href="/teams">Manage teams</Link>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link href="/profile">Edit profile</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/teams">Manage teams</Link>
+          </Button>
+        </div>
       </section>
     </main>
   );
