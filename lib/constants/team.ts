@@ -1,7 +1,20 @@
 import { SKILL_LEVELS } from "@/lib/constants/profile";
-import type { TeamType } from "@/lib/types/team";
+import type { TeamMemberRole, TeamMemberStatus, TeamType } from "@/lib/types/team";
 
 export { SKILL_LEVELS };
+
+export const TEAM_MEMBER_ROLES: { value: TeamMemberRole; label: string }[] = [
+  { value: "player", label: "Player" },
+  { value: "co_captain", label: "Co-Captain" },
+  { value: "captain", label: "Captain" },
+];
+
+export const TEAM_MEMBER_STATUSES: { value: TeamMemberStatus; label: string }[] = [
+  { value: "pending", label: "Pending" },
+  { value: "invited", label: "Invited" },
+  { value: "active", label: "Active" },
+  { value: "removed", label: "Removed" },
+];
 
 export const TEAM_TYPES: { value: TeamType; label: string }[] = [
   { value: "recreational", label: "Recreational" },

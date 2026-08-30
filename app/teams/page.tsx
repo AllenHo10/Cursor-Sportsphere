@@ -2,26 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Shield } from "lucide-react";
 
+import { MembershipActions } from "@/components/teams/membership-actions";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
-import type { SkillLevel } from "@/lib/types/profile";
-import type { Team, TeamType } from "@/lib/types/team";
-
-function parseTeam(row: Record<string, unknown>): Team {
-  return {
-    id: row.id as string,
-    name: row.name as string,
-    sport: row.sport as string,
-    logo_url: (row.logo_url as string | null) ?? null,
-    location: (row.location as string | null) ?? null,
-    description: (row.description as string | null) ?? null,
-    team_type: row.team_type as TeamType,
-    skill_level: (row.skill_level as SkillLevel | null) ?? null,
-    captain_id: row.captain_id as string,
-    created_at: row.created_at as string,
-    updated_at: row.updated_at as string,
-  };
-}
+import { getTeamMemberRoleLabel, parseTeam } from "@/lib/teams/parse";
+import type { Team, TeamMemberRole, TeamMemberStatus } from "@/lib/types/team";
 
 export default async function TeamsPage() {
   const supabase = await createClient();
@@ -37,28 +22,43 @@ export default async function TeamsPage() {
     .from("team_members")
     .select(
       `
+        id,
         role,
+        status,
         teams (*)
       `
     )
     .eq("user_id", user.id)
-    .eq("status", "active")
+    .neq("status", "removed")
     .order("created_at", { ascending: false });
 
-  const teams =
+  const memberships =
     data
       ?.map((membership) => {
         const teamRow = membership.teams as unknown;
         if (!teamRow || Array.isArray(teamRow)) return null;
 
         return {
-          role: membership.role as string,
+          id: membership.id as string,
+          role: membership.role as TeamMemberRole,
+          status: membership.status as TeamMemberStatus,
           team: parseTeam(teamRow as Record<string, unknown>),
         };
       })
       .filter(
-        (item): item is { role: string; team: Team } => item !== null
+        (
+          item
+        ): item is {
+          id: string;
+          role: TeamMemberRole;
+          status: TeamMemberStatus;
+          team: Team;
+        } => item !== null
       ) ?? [];
+
+  const activeTeams = memberships.filter((item) => item.status === "active");
+  const pendingInvites = memberships.filter((item) => item.status === "invited");
+  const pendingRequests = memberships.filter((item) => item.status === "pending");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -84,23 +84,77 @@ export default async function TeamsPage() {
         </div>
       </header>
 
+      {pendingInvites.length > 0 ? (
+        <section className="rounded-lg border p-6">
+          <h2 className="mb-4 text-lg font-medium">Team invites</h2>
+          <ul className="divide-y">
+            {pendingInvites.map(({ id, team }) => (
+              <li key={id} className="space-y-3 py-4 first:pt-0 last:pb-0">
+                <div>
+                  <Link
+                    href={`/teams/${team.id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {team.name}
+                  </Link>
+                  <p className="text-sm text-muted-foreground">
+                    You have been invited to join this team.
+                  </p>
+                </div>
+                <MembershipActions memberId={id} status="invited" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {pendingRequests.length > 0 ? (
+        <section className="rounded-lg border p-6">
+          <h2 className="mb-4 text-lg font-medium">Pending join requests</h2>
+          <ul className="divide-y">
+            {pendingRequests.map(({ id, team }) => (
+              <li key={id} className="space-y-3 py-4 first:pt-0 last:pb-0">
+                <div>
+                  <Link
+                    href={`/teams/${team.id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {team.name}
+                  </Link>
+                  <p className="text-sm text-muted-foreground">
+                    Waiting for captain approval.
+                  </p>
+                </div>
+                <MembershipActions memberId={id} status="pending" />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="rounded-lg border p-6">
+        <h2 className="mb-4 text-lg font-medium">My teams</h2>
         {error ? (
           <p className="text-sm text-destructive" role="alert">
             {error.message}
           </p>
-        ) : teams.length === 0 ? (
+        ) : activeTeams.length === 0 ? (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              You are not on any teams yet. Create one to get started.
+              You are not on any teams yet. Discover teams or create your own.
             </p>
-            <Button asChild>
-              <Link href="/teams/new">Create your first team</Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link href="/teams/discover">Discover teams</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/teams/new">Create team</Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <ul className="divide-y">
-            {teams.map(({ role, team }) => (
+            {activeTeams.map(({ role, team }) => (
               <li key={team.id} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
                   {team.logo_url ? (
@@ -122,12 +176,21 @@ export default async function TeamsPage() {
                     {team.name}
                   </Link>
                   <p className="truncate text-sm text-muted-foreground">
-                    {[team.location, role].filter(Boolean).join(" · ")}
+                    {[team.location, getTeamMemberRoleLabel(role)]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </p>
                 </div>
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/teams/${team.id}`}>View</Link>
-                </Button>
+                <div className="flex gap-2">
+                  {role === "captain" ? (
+                    <Button asChild variant="secondary" size="sm">
+                      <Link href={`/teams/${team.id}/manage`}>Manage</Link>
+                    </Button>
+                  ) : null}
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/teams/${team.id}`}>View</Link>
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>

@@ -26,3 +26,27 @@ export interface TeamWithCaptain extends Team {
     profile_image_url: string | null;
   } | null;
 }
+
+export interface TeamMember {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: TeamMemberRole;
+  status: TeamMemberStatus;
+  delegated_permissions: string[];
+  joined_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamMemberWithProfile extends TeamMember {
+  profile: {
+    name: string;
+    profile_image_url: string | null;
+  } | null;
+}
+
+export interface TeamMembershipSummary {
+  status: TeamMemberStatus | null;
+  role: TeamMemberRole | null;
+}

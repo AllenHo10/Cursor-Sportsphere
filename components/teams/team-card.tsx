@@ -14,15 +14,21 @@ import {
   getSkillLevelLabel,
   getTeamTypeLabel,
 } from "@/lib/teams/parse";
-import type { Team } from "@/lib/types/team";
+import type { Team, TeamMemberStatus } from "@/lib/types/team";
 import { cn } from "@/lib/utils";
 
 interface TeamCardProps {
   team: Team;
+  membershipStatus?: TeamMemberStatus | null;
   isOwnTeam?: boolean;
 }
 
-export function TeamCard({ team, isOwnTeam = false }: TeamCardProps) {
+export function TeamCard({
+  team,
+  membershipStatus = null,
+  isOwnTeam = false,
+}: TeamCardProps) {
+  const isActiveMember = membershipStatus === "active" || isOwnTeam;
   return (
     <Card className="flex h-full flex-col">
       <CardHeader className="space-y-4">
@@ -54,9 +60,17 @@ export function TeamCard({ team, isOwnTeam = false }: TeamCardProps) {
           <span className="rounded-full border bg-muted px-2.5 py-0.5 text-xs font-medium">
             {getSkillLevelLabel(team.skill_level)}
           </span>
-          {isOwnTeam ? (
+          {isActiveMember ? (
             <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               Your team
+            </span>
+          ) : membershipStatus === "pending" ? (
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+              Request pending
+            </span>
+          ) : membershipStatus === "invited" ? (
+            <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+              Invited
             </span>
           ) : null}
         </div>
@@ -77,9 +91,13 @@ export function TeamCard({ team, isOwnTeam = false }: TeamCardProps) {
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link href={`/teams/${team.id}`}>View team</Link>
           </Button>
-          {isOwnTeam ? (
+          {isActiveMember ? (
             <Button variant="secondary" size="sm" className="flex-1" disabled>
               Your team
+            </Button>
+          ) : membershipStatus === "pending" || membershipStatus === "invited" ? (
+            <Button asChild variant="secondary" size="sm" className="flex-1">
+              <Link href={`/teams/${team.id}`}>View status</Link>
             </Button>
           ) : (
             <Button asChild size="sm" className="flex-1">

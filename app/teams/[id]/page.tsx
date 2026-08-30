@@ -2,44 +2,19 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Shield } from "lucide-react";
 
+import { JoinTeamButton } from "@/components/teams/join-team-button";
+import { MembershipActions } from "@/components/teams/membership-actions";
+import { TeamRosterPanel } from "@/components/teams/team-roster-panel";
 import { Button } from "@/components/ui/button";
-import { SKILL_LEVELS, TEAM_TYPES } from "@/lib/constants/team";
 import { createClient } from "@/lib/supabase/server";
-import type { SkillLevel } from "@/lib/types/profile";
-import type { TeamType, TeamWithCaptain } from "@/lib/types/team";
-
-function parseTeam(row: Record<string, unknown>): TeamWithCaptain {
-  const captain = row.captain as Record<string, unknown> | null;
-
-  return {
-    id: row.id as string,
-    name: row.name as string,
-    sport: row.sport as string,
-    logo_url: (row.logo_url as string | null) ?? null,
-    location: (row.location as string | null) ?? null,
-    description: (row.description as string | null) ?? null,
-    team_type: row.team_type as TeamType,
-    skill_level: (row.skill_level as SkillLevel | null) ?? null,
-    captain_id: row.captain_id as string,
-    created_at: row.created_at as string,
-    updated_at: row.updated_at as string,
-    captain: captain
-      ? {
-          name: captain.name as string,
-          profile_image_url: (captain.profile_image_url as string | null) ?? null,
-        }
-      : null,
-  };
-}
-
-function getTeamTypeLabel(value: TeamType) {
-  return TEAM_TYPES.find((type) => type.value === value)?.label ?? value;
-}
-
-function getSkillLevelLabel(value: SkillLevel | null) {
-  if (!value) return "Not specified";
-  return SKILL_LEVELS.find((level) => level.value === value)?.label ?? value;
-}
+import {
+  getSkillLevelLabel,
+  getTeamMemberRoleLabel,
+  getTeamTypeLabel,
+  parseTeamMemberWithProfile,
+  parseTeamWithCaptain,
+} from "@/lib/teams/parse";
+import type { TeamMemberStatus } from "@/lib/types/team";
 
 interface TeamDetailPageProps {
   params: Promise<{ id: string }>;
@@ -56,25 +31,59 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
     redirect(`/login?redirectTo=/teams/${id}`);
   }
 
-  const { data, error } = await supabase
-    .from("teams")
-    .select(
-      `
-        *,
-        captain:profiles!teams_captain_id_fkey (
-          name,
-          profile_image_url
+  const [{ data, error }, { data: membershipData }, { data: rosterData }] =
+    await Promise.all([
+      supabase
+        .from("teams")
+        .select(
+          `
+            *,
+            captain:profiles!teams_captain_id_fkey (
+              name,
+              profile_image_url
+            )
+          `
         )
-      `
-    )
-    .eq("id", id)
-    .single();
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("team_members")
+        .select("id, role, status")
+        .eq("team_id", id)
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("team_members")
+        .select(
+          `
+            *,
+            profile:profiles!team_members_user_id_fkey (
+              name,
+              profile_image_url
+            )
+          `
+        )
+        .eq("team_id", id)
+        .eq("status", "active")
+        .order("joined_at", { ascending: true }),
+    ]);
 
   if (error || !data) {
     notFound();
   }
 
-  const team = parseTeam(data);
+  const team = parseTeamWithCaptain(data as Record<string, unknown>);
+  const membership = membershipData as {
+    id: string;
+    role: string;
+    status: TeamMemberStatus;
+  } | null;
+  const isCaptain = team.captain_id === user.id;
+  const isActiveMember = membership?.status === "active";
+  const activeMembers =
+    rosterData?.map((row) =>
+      parseTeamMemberWithProfile(row as Record<string, unknown>)
+    ) ?? [];
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -121,13 +130,13 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               <dd className="mt-1 text-sm">{team.captain?.name ?? "Unknown"}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-muted-foreground">Created</dt>
+              <dt className="text-sm font-medium text-muted-foreground">Your role</dt>
               <dd className="mt-1 text-sm">
-                {new Date(team.created_at).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {membership
+                  ? getTeamMemberRoleLabel(
+                      membership.role as "player" | "captain" | "co_captain"
+                    )
+                  : "Not a member"}
               </dd>
             </div>
             <div className="sm:col-span-2">
@@ -139,6 +148,46 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
           </dl>
         </div>
       </section>
+
+      {!membership ? (
+        <section className="rounded-lg border p-6">
+          <h2 className="mb-2 text-lg font-medium">Join this team</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Send a join request to the team captain for approval.
+          </p>
+          <JoinTeamButton teamId={id} userId={user.id} />
+        </section>
+      ) : membership.status === "invited" || membership.status === "pending" ? (
+        <section className="rounded-lg border p-6">
+          <h2 className="mb-2 text-lg font-medium">
+            {membership.status === "invited" ? "Team invite" : "Join request"}
+          </h2>
+          <MembershipActions memberId={membership.id} status={membership.status} />
+        </section>
+      ) : null}
+
+      {isCaptain ? (
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+          <h2 className="mb-2 text-lg font-medium">Captain dashboard</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Review pending requests, invite players, and assign Co-Captain roles.
+          </p>
+          <Button asChild>
+            <Link href={`/teams/${id}/manage`}>Manage team</Link>
+          </Button>
+        </section>
+      ) : null}
+
+      {isActiveMember ? (
+        <section className="space-y-3">
+          <h2 className="text-lg font-medium">Roster</h2>
+          <TeamRosterPanel
+            members={activeMembers}
+            isCaptain={isCaptain}
+            currentUserId={user.id}
+          />
+        </section>
+      ) : null}
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="outline">

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { parseTeam } from "@/lib/teams/parse";
 import type { SkillLevel } from "@/lib/types/profile";
-import type { Team, TeamType } from "@/lib/types/team";
+import type { Team, TeamMemberStatus, TeamType } from "@/lib/types/team";
 
 interface DiscoverPageProps {
   searchParams: Promise<{
@@ -82,13 +82,16 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
       query,
       supabase
         .from("team_members")
-        .select("team_id")
+        .select("team_id, status")
         .eq("user_id", user.id)
-        .eq("status", "active"),
+        .neq("status", "removed"),
     ]);
 
-  const ownTeamIds = new Set(
-    memberships?.map((membership) => membership.team_id as string) ?? []
+  const membershipByTeamId = new Map<string, TeamMemberStatus>(
+    memberships?.map((membership) => [
+      membership.team_id as string,
+      membership.status as TeamMemberStatus,
+    ]) ?? []
   );
 
   const teams: Team[] =
@@ -149,7 +152,8 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
               <TeamCard
                 key={team.id}
                 team={team}
-                isOwnTeam={ownTeamIds.has(team.id)}
+                membershipStatus={membershipByTeamId.get(team.id) ?? null}
+                isOwnTeam={membershipByTeamId.get(team.id) === "active"}
               />
             ))}
           </div>
