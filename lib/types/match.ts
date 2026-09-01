@@ -40,3 +40,20 @@ export interface LeadershipTeam {
   sport: string;
   location: string | null;
 }
+
+export type VoteResponse = "yes" | "maybe" | "no";
+
+export interface Vote {
+  id: string;
+  match_id: string;
+  user_id: string;
+  response: VoteResponse;
+  responded_at: string;
+}
+
+export interface VoteWithProfile extends Vote {
+  profile: {
+    name: string;
+    profile_image_url: string | null;
+  } | null;
+}

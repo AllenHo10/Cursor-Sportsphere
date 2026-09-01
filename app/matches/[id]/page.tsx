@@ -7,6 +7,8 @@ import {
   MatchStatusBadge,
   TeamMark,
 } from "@/components/matches/match-summary-card";
+import { MatchVoteForm } from "@/components/matches/match-vote-form";
+import { MatchVoteSummary } from "@/components/matches/match-vote-summary";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import {
@@ -14,10 +16,17 @@ import {
   getMatchFormatLabel,
   getReceivingTeamId,
   isChangeRequest,
+  isVotableMatchStatus,
   MATCH_TEAM_SELECT,
   parseMatchWithTeams,
 } from "@/lib/matches/parse";
+import {
+  parseVote,
+  parseVoteWithProfile,
+  VOTE_WITH_PROFILE_SELECT,
+} from "@/lib/matches/votes";
 import { createClient } from "@/lib/supabase/server";
+import { parseTeamMemberWithProfile } from "@/lib/teams/parse";
 
 interface MatchDetailPageProps {
   params: Promise<{ id: string }>;
@@ -62,6 +71,67 @@ export default async function MatchDetailPage({
     ? receivingTeamId
     : match.proposed_by_team_id;
   const changeRequest = isChangeRequest(match);
+  const canVote = isVotableMatchStatus(match.status);
+  const canSeeVoteBreakdown =
+    canVote &&
+    (leadershipTeamIds.includes(match.home_team_id) ||
+      leadershipTeamIds.includes(match.away_team_id));
+
+  const [
+    { data: memberships },
+    { data: ownVoteData },
+    { data: allVotesData },
+    { data: rosterData },
+  ] = await Promise.all([
+    supabase
+      .from("team_members")
+      .select("team_id, role, status")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .in("team_id", [match.home_team_id, match.away_team_id]),
+    supabase
+      .from("votes")
+      .select("*")
+      .eq("match_id", id)
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    canSeeVoteBreakdown
+      ? supabase
+          .from("votes")
+          .select(VOTE_WITH_PROFILE_SELECT)
+          .eq("match_id", id)
+          .order("responded_at", { ascending: true })
+      : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+    canSeeVoteBreakdown
+      ? supabase
+          .from("team_members")
+          .select(
+            `
+              *,
+              profile:profiles!team_members_user_id_fkey (
+                name,
+                profile_image_url
+              )
+            `
+          )
+          .in("team_id", [match.home_team_id, match.away_team_id])
+          .eq("status", "active")
+          .order("joined_at", { ascending: true })
+      : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+  ]);
+
+  const isMatchMember = (memberships?.length ?? 0) > 0;
+  const currentVote = ownVoteData
+    ? parseVote(ownVoteData as Record<string, unknown>).response
+    : null;
+  const votes =
+    allVotesData?.map((row) =>
+      parseVoteWithProfile(row as Record<string, unknown>)
+    ) ?? [];
+  const members =
+    rosterData?.map((row) =>
+      parseTeamMemberWithProfile(row as Record<string, unknown>)
+    ) ?? [];
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -76,8 +146,8 @@ export default async function MatchDetailPage({
               ? changeRequest
                 ? "The proposed details were updated and need a response."
                 : "Challenge pending captain or co-captain review."
-              : match.status === "scheduled"
-                ? "This match has been accepted and scheduled."
+              : isVotableMatchStatus(match.status)
+                ? "This match has been accepted. Vote on whether you can play."
                 : "Match details"}
           </p>
         </div>
@@ -167,6 +237,32 @@ export default async function MatchDetailPage({
           defaultOpenChanges={action === "changes"}
         />
       </section>
+
+      {canVote && isMatchMember ? (
+        <section id="votes" className="rounded-lg border p-6">
+          <MatchVoteForm
+            matchId={match.id}
+            userId={user.id}
+            currentVote={currentVote}
+          />
+        </section>
+      ) : null}
+
+      {canSeeVoteBreakdown ? (
+        <section
+          className="rounded-lg border p-6"
+          id={canVote && isMatchMember ? undefined : "votes"}
+        >
+          <MatchVoteSummary
+            homeTeamName={match.home_team?.name ?? "Home team"}
+            awayTeamName={match.away_team?.name ?? "Away team"}
+            homeTeamId={match.home_team_id}
+            awayTeamId={match.away_team_id}
+            members={members}
+            votes={votes}
+          />
+        </section>
+      ) : null}
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="outline">

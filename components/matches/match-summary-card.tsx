@@ -94,6 +94,16 @@ export function MatchSummaryCard({
         </Button>
       </div>
 
+      {match.status === "scheduled" || match.status === "confirmed" ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Accepted match —{" "}
+          <Link href={`/matches/${match.id}#votes`} className="underline-offset-4 hover:underline">
+            vote on availability
+          </Link>
+          .
+        </p>
+      ) : null}
+
       <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
         <div className="flex items-start gap-2">
           <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />

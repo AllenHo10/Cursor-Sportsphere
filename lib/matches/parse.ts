@@ -11,6 +11,10 @@ export function isLeadershipRole(role: TeamMemberRole | null | undefined) {
   return role === "captain" || role === "co_captain";
 }
 
+export function isVotableMatchStatus(status: MatchStatus) {
+  return status === "scheduled" || status === "confirmed";
+}
+
 export function parseMatch(row: Record<string, unknown>): Match {
   return {
     id: row.id as string,

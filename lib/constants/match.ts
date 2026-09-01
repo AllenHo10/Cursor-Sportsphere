@@ -1,4 +1,4 @@
-import type { MatchStatus } from "@/lib/types/match";
+import type { MatchStatus, VoteResponse } from "@/lib/types/match";
 
 export const MATCH_FORMATS = [
   { value: "indoor_6v6", label: "Indoor 6v6" },
@@ -18,4 +18,10 @@ export const MATCH_STATUSES: { value: MatchStatus; label: string }[] = [
   { value: "confirmed", label: "Confirmed" },
   { value: "cancelled", label: "Cancelled" },
   { value: "completed", label: "Completed" },
+];
+
+export const VOTE_RESPONSES: { value: VoteResponse; label: string }[] = [
+  { value: "yes", label: "Yes" },
+  { value: "maybe", label: "Maybe" },
+  { value: "no", label: "No" },
 ];
