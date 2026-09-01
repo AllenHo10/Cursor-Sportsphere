@@ -27,6 +27,10 @@ export function parseMatch(row: Record<string, unknown>): Match {
     status: row.status as MatchStatus,
     proposed_by_team_id: row.proposed_by_team_id as string,
     created_by: (row.created_by as string | null) ?? null,
+    home_confirmed_at: (row.home_confirmed_at as string | null) ?? null,
+    away_confirmed_at: (row.away_confirmed_at as string | null) ?? null,
+    home_confirmed_by: (row.home_confirmed_by as string | null) ?? null,
+    away_confirmed_by: (row.away_confirmed_by as string | null) ?? null,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
   };

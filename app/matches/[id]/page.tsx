@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CalendarClock, MapPin, Swords } from "lucide-react";
 
+import { MatchConfirmPanel } from "@/components/matches/match-confirm-panel";
 import { ChallengeResponseActions } from "@/components/matches/challenge-response-actions";
 import {
   MatchStatusBadge,
@@ -11,6 +12,10 @@ import { MatchVoteForm } from "@/components/matches/match-vote-form";
 import { MatchVoteSummary } from "@/components/matches/match-vote-summary";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
+import {
+  fetchMatchParticipation,
+  participationForTeam,
+} from "@/lib/matches/confirmation";
 import {
   formatMatchDateTime,
   getMatchFormatLabel,
@@ -72,16 +77,17 @@ export default async function MatchDetailPage({
     : match.proposed_by_team_id;
   const changeRequest = isChangeRequest(match);
   const canVote = isVotableMatchStatus(match.status);
-  const canSeeVoteBreakdown =
-    canVote &&
-    (leadershipTeamIds.includes(match.home_team_id) ||
-      leadershipTeamIds.includes(match.away_team_id));
+  const isLeadershipOfMatch =
+    leadershipTeamIds.includes(match.home_team_id) ||
+    leadershipTeamIds.includes(match.away_team_id);
+  const loadVoteBreakdown = canVote && (isLeadershipOfMatch || match.status === "confirmed");
 
   const [
     { data: memberships },
     { data: ownVoteData },
     { data: allVotesData },
     { data: rosterData },
+    { data: participationRows },
   ] = await Promise.all([
     supabase
       .from("team_members")
@@ -95,14 +101,14 @@ export default async function MatchDetailPage({
       .eq("match_id", id)
       .eq("user_id", user.id)
       .maybeSingle(),
-    canSeeVoteBreakdown
+    loadVoteBreakdown
       ? supabase
           .from("votes")
           .select(VOTE_WITH_PROFILE_SELECT)
           .eq("match_id", id)
           .order("responded_at", { ascending: true })
       : Promise.resolve({ data: [] as Record<string, unknown>[] }),
-    canSeeVoteBreakdown
+    loadVoteBreakdown
       ? supabase
           .from("team_members")
           .select(
@@ -118,9 +124,13 @@ export default async function MatchDetailPage({
           .eq("status", "active")
           .order("joined_at", { ascending: true })
       : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+    canVote
+      ? fetchMatchParticipation(supabase, id)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const isMatchMember = (memberships?.length ?? 0) > 0;
+  const canSeeVoteBreakdown = loadVoteBreakdown && isMatchMember;
   const currentVote = ownVoteData
     ? parseVote(ownVoteData as Record<string, unknown>).response
     : null;
@@ -132,6 +142,16 @@ export default async function MatchDetailPage({
     rosterData?.map((row) =>
       parseTeamMemberWithProfile(row as Record<string, unknown>)
     ) ?? [];
+  const homeProgress = participationForTeam(
+    participationRows,
+    match.home_team_id,
+    match.format
+  );
+  const awayProgress = participationForTeam(
+    participationRows,
+    match.away_team_id,
+    match.format
+  );
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -146,8 +166,10 @@ export default async function MatchDetailPage({
               ? changeRequest
                 ? "The proposed details were updated and need a response."
                 : "Challenge pending captain or co-captain review."
+              : match.status === "confirmed"
+                ? "This match is confirmed. Details are visible to members of both teams."
               : isVotableMatchStatus(match.status)
-                ? "This match has been accepted. Vote on whether you can play."
+                ? "This match has been accepted. Vote Yes to help reach the minimum, or wait for captains to confirm."
                 : "Match details"}
           </p>
         </div>
@@ -238,12 +260,28 @@ export default async function MatchDetailPage({
         />
       </section>
 
+      {isMatchMember && (match.status === "scheduled" || match.status === "confirmed") ? (
+        <section className="rounded-lg border p-6">
+          <MatchConfirmPanel
+            match={match}
+            userId={user.id}
+            homeTeamName={match.home_team?.name ?? "Home team"}
+            awayTeamName={match.away_team?.name ?? "Away team"}
+            canConfirmHome={leadershipTeamIds.includes(match.home_team_id)}
+            canConfirmAway={leadershipTeamIds.includes(match.away_team_id)}
+            homeProgress={homeProgress}
+            awayProgress={awayProgress}
+          />
+        </section>
+      ) : null}
+
       {canVote && isMatchMember ? (
         <section id="votes" className="rounded-lg border p-6">
           <MatchVoteForm
             matchId={match.id}
             userId={user.id}
             currentVote={currentVote}
+            requiredYesVotes={homeProgress.required}
           />
         </section>
       ) : null}

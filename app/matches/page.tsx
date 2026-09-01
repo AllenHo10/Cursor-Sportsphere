@@ -27,7 +27,7 @@ export default async function MatchesPage() {
     supabase
       .from("matches")
       .select(MATCH_TEAM_SELECT)
-      .in("status", ["challenge_pending", "scheduled", "cancelled"])
+      .in("status", ["challenge_pending", "scheduled", "confirmed", "cancelled"])
       .order("scheduled_at", { ascending: true }),
   ]);
 
@@ -49,6 +49,7 @@ export default async function MatchesPage() {
       !leadershipTeamIds.includes(getReceivingTeamId(match))
   );
   const scheduled = matches.filter((match) => match.status === "scheduled");
+  const confirmed = matches.filter((match) => match.status === "confirmed");
   const cancelled = matches.filter((match) => match.status === "cancelled");
 
   return (
@@ -132,7 +133,7 @@ export default async function MatchesPage() {
         <div>
           <h2 className="text-lg font-medium">Scheduled</h2>
           <p className="text-sm text-muted-foreground">
-            Accepted matches for your teams.
+            Accepted matches waiting for votes or captain confirmation.
           </p>
         </div>
         {scheduled.length === 0 ? (
@@ -142,6 +143,30 @@ export default async function MatchesPage() {
         ) : (
           <div className="space-y-3">
             {scheduled.map((match) => (
+              <MatchSummaryCard
+                key={match.id}
+                match={match}
+                leadershipTeamIds={leadershipTeamIds}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-medium">Confirmed</h2>
+          <p className="text-sm text-muted-foreground">
+            Locked-in matches visible to members of both teams.
+          </p>
+        </div>
+        {confirmed.length === 0 ? (
+          <p className="rounded-lg border p-4 text-sm text-muted-foreground">
+            No confirmed matches yet.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {confirmed.map((match) => (
               <MatchSummaryCard
                 key={match.id}
                 match={match}

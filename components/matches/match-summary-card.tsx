@@ -35,6 +35,8 @@ export function MatchStatusBadge({
         "rounded-full border px-2.5 py-0.5 text-xs font-medium",
         match.status === "scheduled" &&
           "border-emerald-500/30 bg-emerald-500/10 text-emerald-800",
+        match.status === "confirmed" &&
+          "border-blue-500/30 bg-blue-500/10 text-blue-800",
         match.status === "cancelled" && "border bg-muted text-muted-foreground",
         isPending &&
           "border-amber-500/30 bg-amber-500/10 text-amber-800"
@@ -94,11 +96,21 @@ export function MatchSummaryCard({
         </Button>
       </div>
 
-      {match.status === "scheduled" || match.status === "confirmed" ? (
+      {match.status === "scheduled" ? (
         <p className="mt-3 text-sm text-muted-foreground">
           Accepted match —{" "}
           <Link href={`/matches/${match.id}#votes`} className="underline-offset-4 hover:underline">
             vote on availability
+          </Link>{" "}
+          or wait for captains to confirm.
+        </p>
+      ) : null}
+
+      {match.status === "confirmed" ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Confirmed —{" "}
+          <Link href={`/matches/${match.id}`} className="underline-offset-4 hover:underline">
+            view match details
           </Link>
           .
         </p>

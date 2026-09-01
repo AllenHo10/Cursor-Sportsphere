@@ -14,6 +14,7 @@ interface MatchVoteFormProps {
   matchId: string;
   userId: string;
   currentVote: VoteResponse | null;
+  requiredYesVotes: number;
 }
 
 const voteIcons: Record<VoteResponse, ReactNode> = {
@@ -26,6 +27,7 @@ export function MatchVoteForm({
   matchId,
   userId,
   currentVote,
+  requiredYesVotes,
 }: MatchVoteFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<VoteResponse | null>(null);
@@ -59,7 +61,8 @@ export function MatchVoteForm({
       <div>
         <h2 className="text-lg font-medium">Can you play?</h2>
         <p className="text-sm text-muted-foreground">
-          Let your captain know if you can make this match.
+          Yes votes count toward confirming the match. Each team needs at least{" "}
+          {requiredYesVotes} Yes votes, or both captains can confirm manually.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">

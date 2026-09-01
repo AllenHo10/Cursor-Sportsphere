@@ -29,7 +29,7 @@ export default async function DashboardPage() {
       supabase
         .from("matches")
         .select(MATCH_TEAM_SELECT)
-        .in("status", ["challenge_pending", "scheduled"])
+        .in("status", ["challenge_pending", "scheduled", "confirmed"])
         .order("scheduled_at", { ascending: true }),
     ]);
 
@@ -44,7 +44,9 @@ export default async function DashboardPage() {
       match.status === "challenge_pending" &&
       leadershipTeamIds.includes(getReceivingTeamId(match))
   );
-  const scheduled = matches.filter((match) => match.status === "scheduled").slice(0, 3);
+  const upcoming = matches
+    .filter((match) => match.status === "scheduled" || match.status === "confirmed")
+    .slice(0, 5);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -104,7 +106,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      {scheduled.length > 0 ? (
+      {upcoming.length > 0 ? (
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-medium">Upcoming matches</h2>
@@ -112,7 +114,7 @@ export default async function DashboardPage() {
               <Link href="/matches">View all</Link>
             </Button>
           </div>
-          {scheduled.map((match) => (
+          {upcoming.map((match) => (
             <MatchSummaryCard
               key={match.id}
               match={match}

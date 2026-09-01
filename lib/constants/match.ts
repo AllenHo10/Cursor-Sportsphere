@@ -25,3 +25,19 @@ export const VOTE_RESPONSES: { value: VoteResponse; label: string }[] = [
   { value: "maybe", label: "Maybe" },
   { value: "no", label: "No" },
 ];
+
+export const MIN_YES_VOTES_BY_FORMAT: Record<string, number> = {
+  indoor_6v6: 6,
+  mixed_6v6: 6,
+  indoor_4v4: 4,
+  beach_4v4: 4,
+  beach_2v2: 2,
+  other: 4,
+};
+
+export const DEFAULT_MIN_YES_VOTES = 4;
+
+export function getRequiredYesVotes(format: string | null) {
+  if (!format) return DEFAULT_MIN_YES_VOTES;
+  return MIN_YES_VOTES_BY_FORMAT[format] ?? DEFAULT_MIN_YES_VOTES;
+}

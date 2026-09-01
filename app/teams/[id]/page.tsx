@@ -90,7 +90,7 @@ export default async function TeamDetailPage({
       .from("matches")
       .select(MATCH_TEAM_SELECT)
       .or(`home_team_id.eq.${id},away_team_id.eq.${id}`)
-      .in("status", ["challenge_pending", "scheduled"])
+      .in("status", ["challenge_pending", "scheduled", "confirmed"])
       .order("scheduled_at", { ascending: true }),
   ]);
 
@@ -124,7 +124,11 @@ export default async function TeamDetailPage({
   );
   const teamMatches = matches.filter((match) => {
     if (incomingForThisTeam.some((item) => item.id === match.id)) return false;
-    return match.status === "scheduled" || match.status === "challenge_pending";
+    return (
+      match.status === "scheduled" ||
+      match.status === "confirmed" ||
+      match.status === "challenge_pending"
+    );
   });
   const eligibleChallengerTeams = leadershipTeams.filter(
     (item) => item.id !== id && item.sport === team.sport

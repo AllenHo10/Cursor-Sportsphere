@@ -17,6 +17,10 @@ export interface Match {
   status: MatchStatus;
   proposed_by_team_id: string;
   created_by: string | null;
+  home_confirmed_at: string | null;
+  away_confirmed_at: string | null;
+  home_confirmed_by: string | null;
+  away_confirmed_by: string | null;
   created_at: string;
   updated_at: string;
 }
