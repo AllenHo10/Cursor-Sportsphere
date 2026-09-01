@@ -21,12 +21,14 @@ interface TeamCardProps {
   team: Team;
   membershipStatus?: TeamMemberStatus | null;
   isOwnTeam?: boolean;
+  canChallenge?: boolean;
 }
 
 export function TeamCard({
   team,
   membershipStatus = null,
   isOwnTeam = false,
+  canChallenge = false,
 }: TeamCardProps) {
   const isActiveMember = membershipStatus === "active" || isOwnTeam;
   return (
@@ -99,14 +101,14 @@ export function TeamCard({
             <Button asChild variant="secondary" size="sm" className="flex-1">
               <Link href={`/teams/${team.id}`}>View status</Link>
             </Button>
-          ) : (
+          ) : canChallenge ? (
             <Button asChild size="sm" className="flex-1">
-              <Link href={`/teams/${team.id}?intent=challenge`}>
+              <Link href={`/teams/${team.id}?intent=challenge#challenge-form`}>
                 <Swords />
                 Challenge
               </Link>
             </Button>
-          )}
+          ) : null}
         </div>
       </CardContent>
     </Card>

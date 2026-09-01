@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { TeamCard } from "@/components/teams/team-card";
 import { TeamDiscoveryFilters } from "@/components/teams/team-discovery-filters";
 import { Button } from "@/components/ui/button";
+import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import { createClient } from "@/lib/supabase/server";
 import { parseTeam } from "@/lib/teams/parse";
 import type { SkillLevel } from "@/lib/types/profile";
@@ -77,7 +78,7 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
     query = query.ilike("location", `%${locationSearch}%`);
   }
 
-  const [{ data: teamsData, error: teamsError }, { data: memberships }] =
+  const [{ data: teamsData, error: teamsError }, { data: memberships }, leadershipTeams] =
     await Promise.all([
       query,
       supabase
@@ -85,7 +86,9 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
         .select("team_id, status")
         .eq("user_id", user.id)
         .neq("status", "removed"),
+      fetchLeadershipTeams(supabase, user.id),
     ]);
+  const canChallenge = leadershipTeams.length > 0;
 
   const membershipByTeamId = new Map<string, TeamMemberStatus>(
     memberships?.map((membership) => [
@@ -107,6 +110,9 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/matches">Matches</Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="/teams">My teams</Link>
           </Button>
@@ -154,6 +160,7 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
                 team={team}
                 membershipStatus={membershipByTeamId.get(team.id) ?? null}
                 isOwnTeam={membershipByTeamId.get(team.id) === "active"}
+                canChallenge={canChallenge}
               />
             ))}
           </div>

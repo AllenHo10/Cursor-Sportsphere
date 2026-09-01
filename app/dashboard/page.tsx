@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { IncomingChallengeActions } from "@/components/matches/incoming-challenge-actions";
+import { MatchSummaryCard } from "@/components/matches/match-summary-card";
 import { Button } from "@/components/ui/button";
+import { fetchLeadershipTeams } from "@/lib/matches/challenge";
+import {
+  getReceivingTeamId,
+  MATCH_TEAM_SELECT,
+  parseMatchWithTeams,
+} from "@/lib/matches/parse";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
@@ -14,13 +22,29 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, leadershipTeams, { data: matchesData }] =
+    await Promise.all([
+      supabase.from("profiles").select("name").eq("id", user.id).single(),
+      fetchLeadershipTeams(supabase, user.id),
+      supabase
+        .from("matches")
+        .select(MATCH_TEAM_SELECT)
+        .in("status", ["challenge_pending", "scheduled"])
+        .order("scheduled_at", { ascending: true }),
+    ]);
 
   const name = profile?.name ?? user.email ?? "Player";
+  const leadershipTeamIds = leadershipTeams.map((team) => team.id);
+  const matches =
+    matchesData?.map((row) =>
+      parseMatchWithTeams(row as Record<string, unknown>)
+    ) ?? [];
+  const incoming = matches.filter(
+    (match) =>
+      match.status === "challenge_pending" &&
+      leadershipTeamIds.includes(getReceivingTeamId(match))
+  );
+  const scheduled = matches.filter((match) => match.status === "scheduled").slice(0, 3);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
@@ -47,11 +71,56 @@ export default async function DashboardPage() {
           <Button asChild variant="outline">
             <Link href="/teams">Manage teams</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href="/matches">Matches</Link>
+          </Button>
           <Button asChild>
             <Link href="/teams/discover">Discover teams</Link>
           </Button>
         </div>
       </section>
+
+      {incoming.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-medium">Incoming challenges</h2>
+              <p className="text-sm text-muted-foreground">
+                Your teams have match proposals waiting for a response.
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/matches">View all</Link>
+            </Button>
+          </div>
+          {incoming.map((match) => (
+            <MatchSummaryCard
+              key={match.id}
+              match={match}
+              leadershipTeamIds={leadershipTeamIds}
+              footer={<IncomingChallengeActions matchId={match.id} />}
+            />
+          ))}
+        </section>
+      ) : null}
+
+      {scheduled.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-medium">Upcoming matches</h2>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/matches">View all</Link>
+            </Button>
+          </div>
+          {scheduled.map((match) => (
+            <MatchSummaryCard
+              key={match.id}
+              match={match}
+              leadershipTeamIds={leadershipTeamIds}
+            />
+          ))}
+        </section>
+      ) : null}
     </main>
   );
 }
