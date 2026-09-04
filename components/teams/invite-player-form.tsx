@@ -88,12 +88,18 @@ export function InvitePlayerForm({
   return (
     <div className="space-y-4">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <label htmlFor="player-search" className="sr-only">
+          Search players by name
+        </label>
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <Input
+          id="player-search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search players by name..."
           className="pl-9"
+          autoComplete="off"
+          aria-busy={isSearching}
         />
       </div>
 
@@ -116,7 +122,7 @@ export function InvitePlayerForm({
             return (
               <li
                 key={player.id}
-                className="flex items-center justify-between gap-3 p-3"
+                className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <span className="font-medium">{player.name}</span>
                 <Button

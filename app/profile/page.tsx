@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { ProfileForm } from "@/components/profile/profile-form";
+import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import type { Availability, Profile, SkillLevel } from "@/lib/types/profile";
@@ -39,7 +40,7 @@ export default async function ProfilePage() {
 
   if (error || !data) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+      <PageShell>
         <header>
           <h1 className="text-2xl font-semibold">Profile</h1>
           <p className="text-sm text-muted-foreground">
@@ -52,14 +53,14 @@ export default async function ProfilePage() {
         <Button asChild variant="outline" className="w-fit">
           <Link href="/dashboard">Back to dashboard</Link>
         </Button>
-      </main>
+      </PageShell>
     );
   }
 
   const profile = parseProfile(data);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">Profile</h1>
         <p className="text-sm text-muted-foreground">
@@ -67,6 +68,6 @@ export default async function ProfilePage() {
         </p>
       </header>
       <ProfileForm profile={profile} />
-    </main>
+    </PageShell>
   );
 }

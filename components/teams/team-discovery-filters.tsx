@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SKILL_LEVELS, TEAM_SPORTS, TEAM_TYPES } from "@/lib/constants/team";
-import { cn } from "@/lib/utils";
+import { nativeSelectClassName } from "@/lib/utils";
 
 interface TeamDiscoveryFiltersProps {
   profileLocation: string | null;
@@ -67,6 +67,7 @@ export function TeamDiscoveryFilters({
 
       <form
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        aria-busy={isPending}
         onSubmit={(event) => {
           event.preventDefault();
           applyFilters(new FormData(event.currentTarget));
@@ -78,9 +79,7 @@ export function TeamDiscoveryFilters({
             id="sport"
             name="sport"
             defaultValue={sport}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            )}
+            className={nativeSelectClassName}
           >
             <option value="">All sports</option>
             {TEAM_SPORTS.map((item) => (
@@ -98,6 +97,7 @@ export function TeamDiscoveryFilters({
             name="location"
             defaultValue={location}
             placeholder="City, state, or region"
+            autoComplete="address-level2"
           />
         </div>
 
@@ -107,9 +107,7 @@ export function TeamDiscoveryFilters({
             id="teamType"
             name="teamType"
             defaultValue={teamType}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            )}
+            className={nativeSelectClassName}
           >
             <option value="">All types</option>
             {TEAM_TYPES.map((type) => (
@@ -126,9 +124,7 @@ export function TeamDiscoveryFilters({
             id="skillLevel"
             name="skillLevel"
             defaultValue={skillLevel}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            )}
+            className={nativeSelectClassName}
           >
             <option value="">All levels</option>
             {SKILL_LEVELS.map((level) => (
@@ -161,7 +157,14 @@ export function TeamDiscoveryFilters({
 
         <div className="flex flex-wrap items-end gap-2 sm:col-span-2 lg:col-span-3">
           <Button type="submit" disabled={isPending}>
-            Apply filters
+            {isPending ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Applying...
+              </>
+            ) : (
+              "Apply filters"
+            )}
           </Button>
           {hasActiveFilters ? (
             <Button

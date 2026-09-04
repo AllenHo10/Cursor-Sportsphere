@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { CreateTeamForm } from "@/components/teams/create-team-form";
+import { PageShell } from "@/components/layout/page-shell";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function NewTeamPage() {
@@ -14,7 +15,7 @@ export default async function NewTeamPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">New team</h1>
         <p className="text-sm text-muted-foreground">
@@ -22,6 +23,6 @@ export default async function NewTeamPage() {
         </p>
       </header>
       <CreateTeamForm userId={user.id} />
-    </main>
+    </PageShell>
   );
 }

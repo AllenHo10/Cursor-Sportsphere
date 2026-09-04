@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { TeamManageDashboard } from "@/components/teams/team-manage-dashboard";
+import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { parseTeam, parseTeamMemberWithProfile } from "@/lib/teams/parse";
@@ -62,7 +63,7 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
   const activeMembers = members.filter((member) => member.status === "active");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">Manage {team.name}</h1>
         <p className="text-sm text-muted-foreground">
@@ -92,6 +93,6 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
           <Link href="/teams">My teams</Link>
         </Button>
       </div>
-    </main>
+    </PageShell>
   );
 }

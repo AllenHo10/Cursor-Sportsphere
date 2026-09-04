@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2, ShieldMinus, ShieldPlus } from "lucide-react";
 
+import { EmptyState } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { assignCoCaptain, removeCoCaptain } from "@/lib/teams/membership";
@@ -49,7 +50,7 @@ export function TeamRosterPanel({
   }
 
   if (members.length === 0) {
-    return <p className="text-sm text-muted-foreground">No active members yet.</p>;
+    return <EmptyState>No active members yet.</EmptyState>;
   }
 
   return (

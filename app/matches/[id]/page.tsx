@@ -10,6 +10,7 @@ import {
 } from "@/components/matches/match-summary-card";
 import { MatchVoteForm } from "@/components/matches/match-vote-form";
 import { MatchVoteSummary } from "@/components/matches/match-vote-summary";
+import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import {
@@ -154,7 +155,7 @@ export default async function MatchDetailPage({
   );
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">
           {match.home_team?.name ?? "Home team"} vs{" "}
@@ -173,7 +174,7 @@ export default async function MatchDetailPage({
         </p>
       </header>
 
-      <section className="space-y-6 rounded-lg border p-6">
+      <section className="space-y-6 rounded-lg border p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <TeamMark
@@ -254,7 +255,7 @@ export default async function MatchDetailPage({
       </section>
 
       {isMatchMember && (match.status === "scheduled" || match.status === "confirmed") ? (
-        <section className="rounded-lg border p-6">
+        <section className="rounded-lg border p-4 sm:p-6">
           <MatchConfirmPanel
             match={match}
             userId={user.id}
@@ -269,7 +270,7 @@ export default async function MatchDetailPage({
       ) : null}
 
       {canVote && isMatchMember ? (
-        <section id="votes" className="rounded-lg border p-6">
+        <section id="votes" className="rounded-lg border p-4 sm:p-6">
           <MatchVoteForm
             matchId={match.id}
             userId={user.id}
@@ -281,7 +282,7 @@ export default async function MatchDetailPage({
 
       {canSeeVoteBreakdown ? (
         <section
-          className="rounded-lg border p-6"
+          className="rounded-lg border p-4 sm:p-6"
           id={canVote && isMatchMember ? undefined : "votes"}
         >
           <MatchVoteSummary
@@ -306,6 +307,6 @@ export default async function MatchDetailPage({
           <Link href={`/teams/${match.home_team_id}`}>View home team</Link>
         </Button>
       </div>
-    </main>
+    </PageShell>
   );
 }

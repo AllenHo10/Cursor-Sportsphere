@@ -75,6 +75,7 @@ export function MatchVoteForm({
               variant={isSelected ? "default" : "outline"}
               onClick={() => handleVote(option.value)}
               disabled={isLoading !== null}
+              aria-pressed={isSelected}
             >
               {isLoading === option.value ? (
                 <Loader2 className="animate-spin" />

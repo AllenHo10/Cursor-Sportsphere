@@ -1,9 +1,10 @@
 import { SignupForm } from "@/components/auth/signup-form";
+import { PageShell } from "@/components/layout/page-shell";
 
 export default function SignupPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
+    <PageShell variant="auth">
       <SignupForm />
-    </main>
+    </PageShell>
   );
 }

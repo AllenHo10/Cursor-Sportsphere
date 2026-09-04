@@ -168,9 +168,11 @@ export function TeamLogoUpload({
 
         <input
           ref={inputRef}
+          id="team-logo-upload"
           type="file"
           accept={TEAM_LOGO_ACCEPT}
-          className="hidden"
+          className="sr-only"
+          aria-label="Upload team logo"
           disabled={disabled || isUploading}
           onChange={(event) => {
             const file = event.target.files?.[0];

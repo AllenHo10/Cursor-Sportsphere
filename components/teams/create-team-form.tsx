@@ -34,7 +34,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { SkillLevel } from "@/lib/types/profile";
 import type { TeamType } from "@/lib/types/team";
-import { cn } from "@/lib/utils";
+import { nativeSelectClassName, nativeTextareaClassName } from "@/lib/utils";
 
 const teamTypeValues = [
   "recreational",
@@ -159,8 +159,8 @@ export function CreateTeamForm({ userId }: CreateTeamFormProps) {
             />
 
             <FormItem>
-              <FormLabel>Sport</FormLabel>
-              <Input value="Volleyball" disabled readOnly />
+              <FormLabel htmlFor="team-sport">Sport</FormLabel>
+              <Input id="team-sport" value="Volleyball" disabled readOnly />
               <p className="text-xs text-muted-foreground">
                 Only volleyball teams are supported for now.
               </p>
@@ -175,6 +175,7 @@ export function CreateTeamForm({ userId }: CreateTeamFormProps) {
                   <FormControl>
                     <Input
                       placeholder="City, State or Region"
+                      autoComplete="address-level2"
                       disabled={isSubmitting}
                       {...field}
                     />
@@ -192,9 +193,7 @@ export function CreateTeamForm({ userId }: CreateTeamFormProps) {
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <textarea
-                      className={cn(
-                        "flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeTextareaClassName}
                       placeholder="Tell others about your team..."
                       disabled={isSubmitting}
                       {...field}
@@ -215,9 +214,7 @@ export function CreateTeamForm({ userId }: CreateTeamFormProps) {
                   </FormLabel>
                   <FormControl>
                     <select
-                      className={cn(
-                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeSelectClassName}
                       disabled={isSubmitting}
                       value={field.value}
                       onChange={(event) =>
@@ -244,9 +241,7 @@ export function CreateTeamForm({ userId }: CreateTeamFormProps) {
                   <FormLabel>Skill level</FormLabel>
                   <FormControl>
                     <select
-                      className={cn(
-                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeSelectClassName}
                       disabled={isSubmitting}
                       value={field.value ?? ""}
                       onChange={(event) => {

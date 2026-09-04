@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { IncomingChallengeActions } from "@/components/matches/incoming-challenge-actions";
 import { MatchSummaryCard } from "@/components/matches/match-summary-card";
+import { EmptyState, PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import {
@@ -53,7 +54,7 @@ export default async function MatchesPage() {
   const cancelled = matches.filter((match) => match.status === "cancelled");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Matches</h1>
@@ -81,9 +82,7 @@ export default async function MatchesPage() {
           </p>
         </div>
         {incoming.length === 0 ? (
-          <p className="rounded-lg border p-4 text-sm text-muted-foreground">
-            No pending challenges to review.
-          </p>
+          <EmptyState>No pending challenges to review.</EmptyState>
         ) : (
           <div className="space-y-3">
             {incoming.map((match) => (
@@ -106,9 +105,7 @@ export default async function MatchesPage() {
           </p>
         </div>
         {outgoing.length === 0 ? (
-          <p className="rounded-lg border p-4 text-sm text-muted-foreground">
-            No outgoing challenges. Discover a team to send one.
-          </p>
+          <EmptyState>No outgoing challenges. Discover a team to send one.</EmptyState>
         ) : (
           <div className="space-y-3">
             {outgoing.map((match) => (
@@ -130,9 +127,7 @@ export default async function MatchesPage() {
           </p>
         </div>
         {scheduled.length === 0 ? (
-          <p className="rounded-lg border p-4 text-sm text-muted-foreground">
-            No scheduled matches yet.
-          </p>
+          <EmptyState>No scheduled matches yet.</EmptyState>
         ) : (
           <div className="space-y-3">
             {scheduled.map((match) => (
@@ -154,9 +149,7 @@ export default async function MatchesPage() {
           </p>
         </div>
         {confirmed.length === 0 ? (
-          <p className="rounded-lg border p-4 text-sm text-muted-foreground">
-            No confirmed matches yet.
-          </p>
+          <EmptyState>No confirmed matches yet.</EmptyState>
         ) : (
           <div className="space-y-3">
             {confirmed.map((match) => (
@@ -193,6 +186,6 @@ export default async function MatchesPage() {
           <Link href="/dashboard">Dashboard</Link>
         </Button>
       </div>
-    </main>
+    </PageShell>
   );
 }

@@ -31,7 +31,7 @@ import {
 } from "@/lib/matches/schema";
 import { createClient } from "@/lib/supabase/client";
 import type { Match } from "@/lib/types/match";
-import { cn } from "@/lib/utils";
+import { nativeSelectClassName, nativeTextareaClassName } from "@/lib/utils";
 
 interface ChallengeResponseActionsProps {
   match: Match;
@@ -262,9 +262,7 @@ export function ChallengeResponseActions({
                   <FormLabel>Match format</FormLabel>
                   <FormControl>
                     <select
-                      className={cn(
-                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeSelectClassName}
                       disabled={isLoading !== null}
                       value={field.value}
                       onChange={(event) => field.onChange(event.target.value)}
@@ -288,9 +286,7 @@ export function ChallengeResponseActions({
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
                     <textarea
-                      className={cn(
-                        "flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeTextareaClassName}
                       disabled={isLoading !== null}
                       {...field}
                     />

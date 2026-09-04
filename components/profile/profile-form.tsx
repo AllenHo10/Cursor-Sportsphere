@@ -34,7 +34,7 @@ import {
 } from "@/lib/constants/profile";
 import { createClient } from "@/lib/supabase/client";
 import type { Availability, Profile, SkillLevel } from "@/lib/types/profile";
-import { cn } from "@/lib/utils";
+import { nativeSelectClassName } from "@/lib/utils";
 
 const skillLevelValues = ["beginner", "intermediate", "advanced", "open"] as const;
 
@@ -230,6 +230,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                   <FormControl>
                     <Input
                       placeholder="City, State or Region"
+                      autoComplete="address-level2"
                       disabled={isSubmitting}
                       {...field}
                     />
@@ -240,10 +241,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             />
 
             <FormItem>
-              <FormLabel>Sports interests</FormLabel>
+              <FormLabel htmlFor="sport-interest">Sports interests</FormLabel>
               <div className="space-y-3">
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
+                    id="sport-interest"
                     value={sportInput}
                     placeholder="Add a sport"
                     disabled={isSubmitting}
@@ -254,6 +256,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                         addSportInterest(sportInput);
                       }
                     }}
+                    aria-describedby="sport-interest-hint"
                   />
                   <Button
                     type="button"
@@ -304,7 +307,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground">
+                  <p id="sport-interest-hint" className="text-xs text-muted-foreground">
                     Optional. Add sports you play or follow.
                   </p>
                 )}
@@ -337,9 +340,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                   <FormLabel>Skill level</FormLabel>
                   <FormControl>
                     <select
-                      className={cn(
-                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
+                      className={nativeSelectClassName}
                       disabled={isSubmitting}
                       value={field.value ?? ""}
                       onChange={(event) => {
@@ -364,7 +365,40 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
             <FormItem>
               <FormLabel>Availability</FormLabel>
-              <div className="overflow-x-auto rounded-md border">
+              <div className="space-y-3 sm:hidden">
+                {DAYS_OF_WEEK.map((day) => (
+                  <fieldset
+                    key={day.value}
+                    className="rounded-md border p-3"
+                    disabled={isSubmitting}
+                  >
+                    <legend className="px-1 text-sm font-medium">{day.label}</legend>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {TIME_SLOTS.map((slot) => {
+                        const checked =
+                          availability[day.value]?.includes(slot.value) ?? false;
+                        return (
+                          <label
+                            key={slot.value}
+                            className="inline-flex min-h-10 items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                          >
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-input accent-primary"
+                              checked={checked}
+                              onChange={() =>
+                                toggleAvailabilitySlot(day.value, slot.value)
+                              }
+                            />
+                            {slot.label}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                ))}
+              </div>
+              <div className="hidden overflow-x-auto rounded-md border sm:block">
                 <table className="w-full min-w-[28rem] text-sm">
                   <thead>
                     <tr className="border-b bg-muted/50">

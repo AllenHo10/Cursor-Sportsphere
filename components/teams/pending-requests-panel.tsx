@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check, Loader2, X } from "lucide-react";
 
+import { EmptyState } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { approveJoinRequest, rejectJoinRequest } from "@/lib/teams/membership";
@@ -42,9 +43,7 @@ export function PendingRequestsPanel({ requests }: PendingRequestsPanelProps) {
   }
 
   if (requests.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No pending join requests.</p>
-    );
+    return <EmptyState>No pending join requests.</EmptyState>;
   }
 
   return (

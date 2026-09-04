@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { TeamCard } from "@/components/teams/team-card";
 import { TeamDiscoveryFilters } from "@/components/teams/team-discovery-filters";
+import { EmptyState, PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import { createClient } from "@/lib/supabase/server";
@@ -101,7 +102,7 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
     teamsData?.map((row) => parseTeam(row as Record<string, unknown>)) ?? [];
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 p-6">
+    <PageShell width="wide">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Discover teams</h1>
@@ -119,7 +120,7 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
         </div>
       </header>
 
-      <Suspense fallback={<div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading filters...</div>}>
+      <Suspense fallback={<EmptyState>Loading filters...</EmptyState>}>
         <TeamDiscoveryFilters profileLocation={profileLocation} />
       </Suspense>
 
@@ -135,15 +136,17 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
             {teamsError.message}
           </div>
         ) : teams.length === 0 ? (
-          <div className="rounded-lg border p-6">
-            <p className="text-sm text-muted-foreground">
-              No teams match your filters. Try broadening your search or create a
-              new team.
-            </p>
-            <Button asChild className="mt-4">
-              <Link href="/teams/new">Create team</Link>
-            </Button>
-          </div>
+          <EmptyState
+            title="No teams found"
+            action={
+              <Button asChild>
+                <Link href="/teams/new">Create team</Link>
+              </Button>
+            }
+          >
+            No teams match your filters. Try broadening your search or create a
+            new team.
+          </EmptyState>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {teams.map((team) => (
@@ -162,6 +165,6 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
       <Button asChild variant="outline" className="w-fit">
         <Link href="/dashboard">Back to dashboard</Link>
       </Button>
-    </main>
+    </PageShell>
   );
 }

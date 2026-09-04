@@ -8,6 +8,7 @@ import { ProposeChallengeForm } from "@/components/matches/propose-challenge-for
 import { JoinTeamButton } from "@/components/teams/join-team-button";
 import { MembershipActions } from "@/components/teams/membership-actions";
 import { TeamRosterPanel } from "@/components/teams/team-roster-panel";
+import { EmptyState, PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import {
@@ -153,7 +154,7 @@ export default async function TeamDetailPage({
   const showChallengeForm = canProposeChallenge;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">{team.name}</h1>
         <p className="text-sm capitalize text-muted-foreground">
@@ -161,7 +162,7 @@ export default async function TeamDetailPage({
         </p>
       </header>
 
-      <section className="rounded-lg border p-6">
+      <section className="rounded-lg border p-4 sm:p-6">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
             {team.logo_url ? (
@@ -208,7 +209,7 @@ export default async function TeamDetailPage({
       </section>
 
       {!membership ? (
-        <section className="rounded-lg border p-6">
+        <section className="rounded-lg border p-4 sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Join this team</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Send a join request to the team captain for approval.
@@ -216,7 +217,7 @@ export default async function TeamDetailPage({
           <JoinTeamButton teamId={id} userId={user.id} />
         </section>
       ) : membership.status === "invited" || membership.status === "pending" ? (
-        <section className="rounded-lg border p-6">
+        <section className="rounded-lg border p-4 sm:p-6">
           <h2 className="mb-2 text-lg font-medium">
             {membership.status === "invited" ? "Team invite" : "Join request"}
           </h2>
@@ -276,7 +277,7 @@ export default async function TeamDetailPage({
           }
         />
       ) : intent === "challenge" && !isActiveMember ? (
-        <section className="rounded-lg border p-6">
+        <section className="rounded-lg border p-4 sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Challenge this team</h2>
           <p className="text-sm text-muted-foreground">
             Only captains and co-captains can propose a match. Create a team or
@@ -293,7 +294,7 @@ export default async function TeamDetailPage({
         </section>
       ) : null}
 
-      {isActiveMember && teamMatches.length > 0 ? (
+      {isActiveMember ? (
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-medium">Matches</h2>
@@ -301,15 +302,19 @@ export default async function TeamDetailPage({
               <Link href="/matches">View all</Link>
             </Button>
           </div>
-          <div className="space-y-3">
-            {teamMatches.map((match) => (
-              <MatchSummaryCard
-                key={match.id}
-                match={match}
-                leadershipTeamIds={leadershipTeamIds}
-              />
-            ))}
-          </div>
+          {teamMatches.length === 0 ? (
+            <EmptyState>No matches for this team yet.</EmptyState>
+          ) : (
+            <div className="space-y-3">
+              {teamMatches.map((match) => (
+                <MatchSummaryCard
+                  key={match.id}
+                  match={match}
+                  leadershipTeamIds={leadershipTeamIds}
+                />
+              ))}
+            </div>
+          )}
         </section>
       ) : null}
 
@@ -335,6 +340,6 @@ export default async function TeamDetailPage({
           <Link href="/dashboard">Dashboard</Link>
         </Button>
       </div>
-    </main>
+    </PageShell>
   );
 }

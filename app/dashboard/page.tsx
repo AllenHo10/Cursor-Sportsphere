@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { IncomingChallengeActions } from "@/components/matches/incoming-challenge-actions";
 import { MatchSummaryCard } from "@/components/matches/match-summary-card";
+import { EmptyState, PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { fetchLeadershipTeams } from "@/lib/matches/challenge";
 import {
@@ -49,12 +50,12 @@ export default async function DashboardPage() {
     .slice(0, 5);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
+    <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Welcome back, {name}</p>
       </header>
-      <section className="rounded-lg border p-6">
+      <section className="rounded-lg border p-4 sm:p-6">
         <h2 className="mb-2 text-lg font-medium">Quick links</h2>
         <p className="mb-4 text-sm text-muted-foreground">
           Manage your teams and matches from here.
@@ -115,7 +116,12 @@ export default async function DashboardPage() {
             />
           ))}
         </section>
+      ) : incoming.length === 0 ? (
+        <EmptyState title="No matches yet">
+          Discover a team to challenge, or wait for an upcoming match to appear
+          here.
+        </EmptyState>
       ) : null}
-    </main>
+    </PageShell>
   );
 }

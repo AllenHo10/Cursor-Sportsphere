@@ -38,8 +38,14 @@ export function JoinTeamButton({ teamId, userId }: JoinTeamButtonProps) {
   return (
     <div className="space-y-2">
       <Button onClick={handleJoin} disabled={isLoading}>
-        {isLoading ? <Loader2 className="animate-spin" /> : null}
-        Request to join
+        {isLoading ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Sending request...
+          </>
+        ) : (
+          "Request to join"
+        )}
       </Button>
       {error ? (
         <p className="text-sm text-destructive" role="alert">

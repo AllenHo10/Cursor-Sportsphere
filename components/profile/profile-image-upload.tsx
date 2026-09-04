@@ -168,9 +168,11 @@ export function ProfileImageUpload({
 
         <input
           ref={inputRef}
+          id="profile-image-upload"
           type="file"
           accept={PROFILE_IMAGE_ACCEPT}
-          className="hidden"
+          className="sr-only"
+          aria-label="Upload profile photo"
           disabled={disabled || isUploading}
           onChange={(event) => {
             const file = event.target.files?.[0];

@@ -32,12 +32,14 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const markAttemptedRef = useRef(false);
   const openRef = useRef(open);
   openRef.current = open;
 
   const loadNotifications = useCallback(async () => {
     if (openRef.current) return;
+    setIsLoading(true);
     const supabase = createClient();
     const [listResult, countResult] = await Promise.all([
       supabase
@@ -55,6 +57,7 @@ export function NotificationBell() {
 
     if (listResult.error) {
       setLoadError(listResult.error.message);
+      setIsLoading(false);
       return;
     }
 
@@ -65,6 +68,7 @@ export function NotificationBell() {
       )
     );
     setUnreadCount(countResult.count ?? 0);
+    setIsLoading(false);
   }, []);
 
   const markAsRead = useCallback(async (items: AppNotification[]) => {
@@ -172,12 +176,14 @@ export function NotificationBell() {
             ? `Notifications, ${unreadCount} unread`
             : "Notifications"
         }
+        aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={menuId}
+        aria-busy={isLoading}
         onClick={handleToggle}
         className="relative"
       >
-        <Bell />
+        <Bell aria-hidden="true" />
         {unreadCount > 0 ? (
           <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground">
             {formatUnreadCount(unreadCount)}
@@ -187,9 +193,9 @@ export function NotificationBell() {
       {open ? (
         <div
           id={menuId}
-          role="menu"
+          role="dialog"
           aria-label="Recent notifications"
-          className="absolute right-0 z-50 mt-2 w-[min(calc(100vw-2rem),20rem)] overflow-hidden rounded-lg border bg-background shadow-lg"
+          className="fixed inset-x-2 top-[3.75rem] z-50 overflow-hidden rounded-lg border bg-background shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80"
         >
           <div className="border-b px-3 py-2">
             <p className="text-sm font-medium">Notifications</p>
@@ -197,6 +203,10 @@ export function NotificationBell() {
           {loadError ? (
             <p className="px-3 py-4 text-sm text-destructive" role="alert">
               {loadError}
+            </p>
+          ) : isLoading && notifications.length === 0 ? (
+            <p className="px-3 py-6 text-sm text-muted-foreground" role="status">
+              Loading notifications...
             </p>
           ) : notifications.length === 0 ? (
             <p className="px-3 py-6 text-sm text-muted-foreground">
@@ -210,7 +220,6 @@ export function NotificationBell() {
                   <li key={notification.id} className="border-b last:border-b-0">
                     <Link
                       href={getNotificationHref(notification)}
-                      role="menuitem"
                       className={cn(
                         "block px-3 py-3 text-left hover:bg-accent",
                         unread && "bg-accent/50"
