@@ -63,18 +63,11 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">Manage {team.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            Review join requests, invite players, and manage roles.
-          </p>
-        </div>
-        <form action="/logout" method="post">
-          <Button type="submit" variant="outline">
-            Log out
-          </Button>
-        </form>
+      <header>
+        <h1 className="text-2xl font-semibold">Manage {team.name}</h1>
+        <p className="text-sm text-muted-foreground">
+          Review join requests, invite players, and manage roles.
+        </p>
       </header>
 
       {membersError ? (

@@ -111,19 +111,11 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline">
-            <Link href="/matches">Matches</Link>
-          </Button>
-          <Button asChild variant="outline">
             <Link href="/teams">My teams</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild>
             <Link href="/teams/new">Create team</Link>
           </Button>
-          <form action="/logout" method="post">
-            <Button type="submit" variant="outline">
-              Log out
-            </Button>
-          </form>
         </div>
       </header>
 

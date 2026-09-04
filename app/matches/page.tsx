@@ -61,16 +61,9 @@ export default async function MatchesPage() {
             Propose challenges, respond to opponents, and track scheduled games.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild>
-            <Link href="/teams/discover">Find a team to challenge</Link>
-          </Button>
-          <form action="/logout" method="post">
-            <Button type="submit" variant="outline">
-              Log out
-            </Button>
-          </form>
-        </div>
+        <Button asChild>
+          <Link href="/teams/discover">Find a team to challenge</Link>
+        </Button>
       </header>
 
       {error ? (

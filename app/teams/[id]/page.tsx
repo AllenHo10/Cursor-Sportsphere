@@ -154,18 +154,11 @@ export default async function TeamDetailPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{team.name}</h1>
-          <p className="text-sm capitalize text-muted-foreground">
-            {team.sport} · {getTeamTypeLabel(team.team_type)}
-          </p>
-        </div>
-        <form action="/logout" method="post">
-          <Button type="submit" variant="outline">
-            Log out
-          </Button>
-        </form>
+      <header>
+        <h1 className="text-2xl font-semibold">{team.name}</h1>
+        <p className="text-sm capitalize text-muted-foreground">
+          {team.sport} · {getTeamTypeLabel(team.team_type)}
+        </p>
       </header>
 
       <section className="rounded-lg border p-6">

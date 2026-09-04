@@ -71,19 +71,11 @@ export default async function TeamsPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline">
-            <Link href="/matches">Matches</Link>
-          </Button>
-          <Button asChild variant="outline">
             <Link href="/teams/discover">Discover teams</Link>
           </Button>
           <Button asChild>
             <Link href="/teams/new">Create team</Link>
           </Button>
-          <form action="/logout" method="post">
-            <Button type="submit" variant="outline">
-              Log out
-            </Button>
-          </form>
         </div>
       </header>
 
