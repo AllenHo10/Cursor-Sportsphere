@@ -179,11 +179,18 @@ export default async function TeamsPage() {
                       .join(" · ")}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {role === "captain" ? (
-                    <Button asChild variant="secondary" size="sm">
-                      <Link href={`/teams/${team.id}/manage`}>Manage</Link>
-                    </Button>
+                    <>
+                      <Button asChild variant="secondary" size="sm">
+                        <Link href={`/teams/${team.id}/manage#edit-team`}>
+                          Edit team
+                        </Link>
+                      </Button>
+                      <Button asChild variant="secondary" size="sm">
+                        <Link href={`/teams/${team.id}/manage`}>Manage</Link>
+                      </Button>
+                    </>
                   ) : null}
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/teams/${team.id}`}>View</Link>

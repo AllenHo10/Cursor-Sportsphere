@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { TeamDetailsForm } from "@/components/teams/team-details-form";
 import { TeamManageDashboard } from "@/components/teams/team-manage-dashboard";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -67,9 +68,12 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
       <header>
         <h1 className="text-2xl font-semibold">Manage {team.name}</h1>
         <p className="text-sm text-muted-foreground">
-          Review join requests, invite players, and manage roles.
+          Edit team details, review join requests, invite players, and manage
+          roles.
         </p>
       </header>
+
+      <TeamDetailsForm userId={user.id} team={team} />
 
       {membersError ? (
         <p className="text-sm text-destructive" role="alert">

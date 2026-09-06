@@ -226,14 +226,20 @@ export default async function TeamDetailPage({
       ) : null}
 
       {isCaptain ? (
-        <section className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Captain dashboard</h2>
           <p className="mb-4 text-sm text-muted-foreground">
-            Review pending requests, invite players, and assign Co-Captain roles.
+            Edit team details, review pending requests, invite players, and
+            assign Co-Captain roles.
           </p>
-          <Button asChild>
-            <Link href={`/teams/${id}/manage`}>Manage team</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href={`/teams/${id}/manage#edit-team`}>Edit team</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={`/teams/${id}/manage`}>Manage members</Link>
+            </Button>
+          </div>
         </section>
       ) : null}
 
