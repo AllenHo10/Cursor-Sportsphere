@@ -16,6 +16,14 @@ function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.includes(pathname);
 }
 
+function redirectWithSessionCookies(url: URL, supabaseResponse: NextResponse) {
+  const redirectResponse = NextResponse.redirect(url);
+  supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+    redirectResponse.cookies.set(name, value);
+  });
+  return redirectResponse;
+}
+
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
@@ -24,14 +32,14 @@ export async function middleware(request: NextRequest) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.searchParams.set("redirectTo", pathname);
-    return NextResponse.redirect(loginUrl);
+    return redirectWithSessionCookies(loginUrl, supabaseResponse);
   }
 
   if (user && isAuthRoute(pathname)) {
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = "/dashboard";
     dashboardUrl.search = "";
-    return NextResponse.redirect(dashboardUrl);
+    return redirectWithSessionCookies(dashboardUrl, supabaseResponse);
   }
 
   return supabaseResponse;

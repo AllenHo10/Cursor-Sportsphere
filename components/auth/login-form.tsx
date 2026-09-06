@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { safeInternalPath } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/client";
 
 const loginSchema = z.object({
@@ -37,7 +38,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? "/dashboard";
+  const redirectTo = safeInternalPath(searchParams.get("redirectTo"));
   const [authError, setAuthError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
