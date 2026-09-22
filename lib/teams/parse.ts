@@ -7,6 +7,7 @@ import {
 import type { SkillLevel } from "@/lib/types/profile";
 import type {
   Team,
+  TeamEmailInvite,
   TeamMember,
   TeamMemberRole,
   TeamMemberStatus,
@@ -94,4 +95,15 @@ export function getTeamMemberRoleLabel(value: TeamMemberRole) {
 
 export function getTeamMemberStatusLabel(value: TeamMemberStatus) {
   return TEAM_MEMBER_STATUSES.find((status) => status.value === value)?.label ?? value;
+}
+
+export function parseTeamEmailInvite(row: Record<string, unknown>): TeamEmailInvite {
+  return {
+    id: row.id as string,
+    team_id: row.team_id as string,
+    email: row.email as string,
+    invited_by: row.invited_by as string,
+    status: row.status as TeamEmailInvite["status"],
+    created_at: row.created_at as string,
+  };
 }

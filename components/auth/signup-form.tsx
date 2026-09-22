@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -43,8 +43,11 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteId = searchParams.get("invite");
   const [authError, setAuthError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [inviteTeamName, setInviteTeamName] = useState<string | null>(null);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -58,6 +61,35 @@ export function SignupForm() {
 
   const isSubmitting = form.formState.isSubmitting;
 
+  useEffect(() => {
+    if (!inviteId) {
+      setInviteTeamName(null);
+      return;
+    }
+
+    const supabase = createClient();
+    let cancelled = false;
+
+    supabase
+      .rpc("get_email_invite_info", { p_invite_id: inviteId })
+      .then(({ data }) => {
+        if (cancelled) {
+          return;
+        }
+
+        const row = Array.isArray(data) ? data[0] : data;
+        const name =
+          row && typeof row === "object"
+            ? (row as { team_name?: unknown }).team_name
+            : null;
+        setInviteTeamName(typeof name === "string" ? name : null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [inviteId]);
+
   async function onSubmit(values: SignupFormValues) {
     setAuthError(null);
     setSuccessMessage(null);
@@ -69,7 +101,9 @@ export function SignupForm() {
       options: {
         data: {
           name: values.name,
+          ...(inviteId ? { team_email_invite_id: inviteId } : {}),
         },
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent("/teams")}`,
       },
     });
 
@@ -79,13 +113,16 @@ export function SignupForm() {
     }
 
     if (data.session) {
-      router.push("/dashboard");
+      await supabase.rpc("apply_pending_email_invites");
+      router.push("/teams");
       router.refresh();
       return;
     }
 
     setSuccessMessage(
-      "Account created. Check your email to confirm your address, then log in."
+      inviteId
+        ? "Account created. Check your email to confirm your address. Use the invited email so the team invite can be attached."
+        : "Account created. Check your email to confirm your address, then log in."
     );
     form.reset();
   }
@@ -95,7 +132,11 @@ export function SignupForm() {
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>
-          Join SportSphere with your email and password.
+          {inviteId
+            ? inviteTeamName
+              ? `Join ${inviteTeamName} on SportSphere. Sign up with the email address that received this invite so the team invite can be attached.`
+              : "You've been invited to join a team. Sign up with the email address that received this invite so the team invite can be attached."
+            : "Join SportSphere with your email and password."}
         </CardDescription>
       </CardHeader>
       <CardContent>

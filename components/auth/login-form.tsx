@@ -65,6 +65,8 @@ export function LoginForm() {
       return;
     }
 
+    await supabase.rpc("apply_pending_email_invites");
+
     router.push(redirectTo);
     router.refresh();
   }

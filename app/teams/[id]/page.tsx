@@ -106,6 +106,8 @@ export default async function TeamDetailPage({
     status: TeamMemberStatus;
   } | null;
   const isCaptain = team.captain_id === user.id;
+  const isCoCaptain =
+    membership?.status === "active" && membership.role === "co_captain";
   const isActiveMember = membership?.status === "active";
   const isLeadershipOfThisTeam = leadershipTeams.some((item) => item.id === id);
   const activeMembers =
@@ -240,6 +242,17 @@ export default async function TeamDetailPage({
               <Link href={`/teams/${id}/manage`}>Manage members</Link>
             </Button>
           </div>
+        </section>
+      ) : isCoCaptain ? (
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-6">
+          <h2 className="mb-2 text-lg font-medium">Invite players</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Search for existing players or invite someone by email, including
+            people who do not have an account yet.
+          </p>
+          <Button asChild>
+            <Link href={`/teams/${id}/manage`}>Invite players</Link>
+          </Button>
         </section>
       ) : null}
 

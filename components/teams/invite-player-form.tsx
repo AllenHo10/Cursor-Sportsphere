@@ -111,7 +111,11 @@ export function InvitePlayerForm({
       ) : null}
 
       {query.trim().length >= 2 && !isSearching && results.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No players found.</p>
+        <p className="text-sm text-muted-foreground">
+          {query.includes("@")
+            ? "No matching player. Use Invite by email below to invite this address."
+            : "No players found."}
+        </p>
       ) : null}
 
       {results.length > 0 ? (

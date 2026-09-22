@@ -6,6 +6,8 @@ export type TeamMemberRole = "player" | "captain" | "co_captain";
 
 export type TeamMemberStatus = "pending" | "invited" | "active" | "removed";
 
+export type TeamEmailInviteStatus = "pending" | "accepted" | "cancelled";
+
 export interface Team {
   id: string;
   name: string;
@@ -49,4 +51,13 @@ export interface TeamMemberWithProfile extends TeamMember {
 export interface TeamMembershipSummary {
   status: TeamMemberStatus | null;
   role: TeamMemberRole | null;
+}
+
+export interface TeamEmailInvite {
+  id: string;
+  team_id: string;
+  email: string;
+  invited_by: string;
+  status: TeamEmailInviteStatus;
+  created_at: string;
 }

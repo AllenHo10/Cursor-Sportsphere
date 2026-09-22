@@ -36,6 +36,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isAuthRoute(pathname)) {
+    const invite = request.nextUrl.searchParams.get("invite");
+
+    if (pathname === "/signup" && invite) {
+      const confirmUrl = request.nextUrl.clone();
+      confirmUrl.pathname = "/auth/confirm";
+      confirmUrl.search = `?next=${encodeURIComponent("/teams")}`;
+      return redirectWithSessionCookies(confirmUrl, supabaseResponse);
+    }
+
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = "/dashboard";
     dashboardUrl.search = "";

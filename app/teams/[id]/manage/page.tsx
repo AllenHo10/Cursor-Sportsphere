@@ -6,7 +6,8 @@ import { TeamManageDashboard } from "@/components/teams/team-manage-dashboard";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
-import { parseTeam, parseTeamMemberWithProfile } from "@/lib/teams/parse";
+import { parseTeam, parseTeamEmailInvite, parseTeamMemberWithProfile } from "@/lib/teams/parse";
+import type { TeamMemberRole, TeamMemberStatus } from "@/lib/types/team";
 
 interface TeamManagePageProps {
   params: Promise<{ id: string }>;
@@ -35,7 +36,22 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
 
   const team = parseTeam(teamData as Record<string, unknown>);
 
-  if (team.captain_id !== user.id) {
+  const { data: membershipData } = await supabase
+    .from("team_members")
+    .select("role, status")
+    .eq("team_id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const membership = membershipData as {
+    role: TeamMemberRole;
+    status: TeamMemberStatus;
+  } | null;
+  const isCaptain = team.captain_id === user.id;
+  const isCoCaptain =
+    membership?.status === "active" && membership.role === "co_captain";
+
+  if (!isCaptain && !isCoCaptain) {
     redirect(`/teams/${id}`);
   }
 
@@ -63,17 +79,30 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
   const invitedMembers = members.filter((member) => member.status === "invited");
   const activeMembers = members.filter((member) => member.status === "active");
 
+  const { data: emailInvitesData } = await supabase
+    .from("team_email_invites")
+    .select("*")
+    .eq("team_id", id)
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  const pendingEmailInvites =
+    emailInvitesData?.map((row) =>
+      parseTeamEmailInvite(row as Record<string, unknown>)
+    ) ?? [];
+
   return (
     <PageShell>
       <header>
         <h1 className="text-2xl font-semibold">Manage {team.name}</h1>
         <p className="text-sm text-muted-foreground">
-          Edit team details, review join requests, invite players, and manage
-          roles.
+          {isCaptain
+            ? "Edit team details, review join requests, invite players, and manage roles."
+            : "Invite players to this team."}
         </p>
       </header>
 
-      <TeamDetailsForm userId={user.id} team={team} />
+      {isCaptain ? <TeamDetailsForm userId={user.id} team={team} /> : null}
 
       {membersError ? (
         <p className="text-sm text-destructive" role="alert">
@@ -83,8 +112,10 @@ export default async function TeamManagePage({ params }: TeamManagePageProps) {
         <TeamManageDashboard
           teamId={id}
           currentUserId={user.id}
+          isCaptain={isCaptain}
           pendingRequests={pendingRequests}
           invitedMembers={invitedMembers}
+          pendingEmailInvites={pendingEmailInvites}
           activeMembers={activeMembers}
         />
       )}
