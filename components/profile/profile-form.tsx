@@ -369,7 +369,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 {DAYS_OF_WEEK.map((day) => (
                   <fieldset
                     key={day.value}
-                    className="rounded-md border p-3"
+                    className="rounded-md border bg-secondary p-3"
                     disabled={isSubmitting}
                   >
                     <legend className="px-1 text-sm font-medium">{day.label}</legend>

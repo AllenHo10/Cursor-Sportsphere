@@ -164,7 +164,7 @@ export default async function TeamDetailPage({
         </p>
       </header>
 
-      <section className="rounded-lg border p-4 sm:p-6">
+      <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
             {team.logo_url ? (
@@ -211,7 +211,7 @@ export default async function TeamDetailPage({
       </section>
 
       {!membership ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Join this team</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Send a join request to the team captain for approval.
@@ -219,7 +219,7 @@ export default async function TeamDetailPage({
           <JoinTeamButton teamId={id} userId={user.id} />
         </section>
       ) : membership.status === "invited" || membership.status === "pending" ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="mb-2 text-lg font-medium">
             {membership.status === "invited" ? "Team invite" : "Join request"}
           </h2>
@@ -228,7 +228,7 @@ export default async function TeamDetailPage({
       ) : null}
 
       {isCaptain ? (
-        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-6">
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 shadow-sm sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Captain dashboard</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Edit team details, review pending requests, invite players, and
@@ -244,7 +244,7 @@ export default async function TeamDetailPage({
           </div>
         </section>
       ) : isCoCaptain ? (
-        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 sm:p-6">
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-4 shadow-sm sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Invite players</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Search for existing players or invite someone by email, including
@@ -296,7 +296,7 @@ export default async function TeamDetailPage({
           }
         />
       ) : intent === "challenge" && !isActiveMember ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="mb-2 text-lg font-medium">Challenge this team</h2>
           <p className="text-sm text-muted-foreground">
             Only captains and co-captains can propose a match. Create a team or

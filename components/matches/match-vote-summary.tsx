@@ -55,7 +55,7 @@ function TeamVoteList({
       {members.length === 0 ? (
         <p className="text-sm text-muted-foreground">No roster to show.</p>
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y rounded-lg border bg-card shadow-sm">
           {members.map((member) => {
             const vote = votesByUserId.get(member.user_id) ?? null;
             return (
@@ -103,15 +103,15 @@ export function MatchVoteSummary({
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border p-4">
+        <div className="rounded-lg border bg-card p-4 shadow-sm">
           <p className="text-sm text-muted-foreground">Yes</p>
           <p className="text-2xl font-semibold">{totals.yes}</p>
         </div>
-        <div className="rounded-lg border p-4">
+        <div className="rounded-lg border bg-card p-4 shadow-sm">
           <p className="text-sm text-muted-foreground">Maybe</p>
           <p className="text-2xl font-semibold">{totals.maybe}</p>
         </div>
-        <div className="rounded-lg border p-4">
+        <div className="rounded-lg border bg-card p-4 shadow-sm">
           <p className="text-sm text-muted-foreground">No</p>
           <p className="text-2xl font-semibold">{totals.no}</p>
         </div>

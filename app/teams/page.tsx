@@ -81,7 +81,7 @@ export default async function TeamsPage() {
       </header>
 
       {pendingInvites.length > 0 ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="mb-4 text-lg font-medium">Team invites</h2>
           <ul className="divide-y">
             {pendingInvites.map(({ id, team }) => (
@@ -105,7 +105,7 @@ export default async function TeamsPage() {
       ) : null}
 
       {pendingRequests.length > 0 ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <h2 className="mb-4 text-lg font-medium">Pending join requests</h2>
           <ul className="divide-y">
             {pendingRequests.map(({ id, team }) => (
@@ -128,7 +128,7 @@ export default async function TeamsPage() {
         </section>
       ) : null}
 
-      <section className="rounded-lg border p-4 sm:p-6">
+      <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="mb-4 text-lg font-medium">My teams</h2>
         {error ? (
           <p className="text-sm text-destructive" role="alert">

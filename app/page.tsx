@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <PageShell variant="landing">
       <div>
-        <h1 className="text-3xl font-semibold">SportSphere</h1>
+        <h1 className="text-3xl font-semibold text-foreground">SportSphere</h1>
         <p className="mt-2 text-muted-foreground">
           Team coordination for volleyball and beyond.
         </p>

@@ -48,7 +48,7 @@ export function PendingRequestsPanel({ requests }: PendingRequestsPanelProps) {
 
   return (
     <div className="space-y-3">
-      <ul className="divide-y rounded-lg border">
+      <ul className="divide-y rounded-lg border bg-card shadow-sm">
         {requests.map((request) => (
           <li
             key={request.id}

@@ -132,7 +132,7 @@ export default async function TeamDiscoverPage({ searchParams }: DiscoverPagePro
         </div>
 
         {teamsError ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive shadow-sm">
             {teamsError.message}
           </div>
         ) : teams.length === 0 ? (

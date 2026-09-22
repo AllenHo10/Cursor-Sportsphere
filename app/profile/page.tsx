@@ -47,7 +47,7 @@ export default async function ProfilePage() {
             We could not load your profile.
           </p>
         </header>
-        <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive">
+        <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-sm text-destructive shadow-sm">
           {error?.message ?? "Profile not found."}
         </section>
         <Button asChild variant="outline" className="w-fit">

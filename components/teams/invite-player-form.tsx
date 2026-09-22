@@ -119,7 +119,7 @@ export function InvitePlayerForm({
       ) : null}
 
       {results.length > 0 ? (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y rounded-lg border bg-card shadow-sm">
           {results.map((player) => {
             const alreadyMember = existingIds.has(player.id);
 

@@ -42,7 +42,7 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border p-4 sm:p-6">
+    <div className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
       {title ? <p className="font-medium">{title}</p> : null}
       <p className={cn("text-sm text-muted-foreground", title && "mt-1")}>
         {children}

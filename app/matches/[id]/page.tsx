@@ -174,7 +174,7 @@ export default async function MatchDetailPage({
         </p>
       </header>
 
-      <section className="space-y-6 rounded-lg border p-4 sm:p-6">
+      <section className="space-y-6 rounded-lg border bg-card p-4 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <TeamMark
@@ -255,7 +255,7 @@ export default async function MatchDetailPage({
       </section>
 
       {isMatchMember && (match.status === "scheduled" || match.status === "confirmed") ? (
-        <section className="rounded-lg border p-4 sm:p-6">
+        <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <MatchConfirmPanel
             match={match}
             userId={user.id}
@@ -270,7 +270,7 @@ export default async function MatchDetailPage({
       ) : null}
 
       {canVote && isMatchMember ? (
-        <section id="votes" className="rounded-lg border p-4 sm:p-6">
+        <section id="votes" className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
           <MatchVoteForm
             matchId={match.id}
             userId={user.id}
@@ -282,7 +282,7 @@ export default async function MatchDetailPage({
 
       {canSeeVoteBreakdown ? (
         <section
-          className="rounded-lg border p-4 sm:p-6"
+          className="rounded-lg border bg-card p-4 shadow-sm sm:p-6"
           id={canVote && isMatchMember ? undefined : "votes"}
         >
           <MatchVoteSummary

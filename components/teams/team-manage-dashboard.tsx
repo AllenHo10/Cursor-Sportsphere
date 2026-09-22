@@ -72,7 +72,7 @@ export function TeamManageDashboard({
               Players who have been invited but have not accepted yet.
             </p>
           </div>
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y rounded-lg border bg-card shadow-sm">
             {invitedMembers.map((member) => (
               <li key={member.id} className="p-4">
                 <p className="font-medium">

@@ -55,7 +55,7 @@ export function TeamRosterPanel({
 
   return (
     <div className="space-y-3">
-      <ul className="divide-y rounded-lg border">
+      <ul className="divide-y rounded-lg border bg-card shadow-sm">
         {members.map((member) => {
           const isSelf = member.user_id === currentUserId;
           const canPromote =

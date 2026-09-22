@@ -55,7 +55,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Welcome back, {name}</p>
       </header>
-      <section className="rounded-lg border p-4 sm:p-6">
+      <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="mb-2 text-lg font-medium">Quick links</h2>
         <p className="mb-4 text-sm text-muted-foreground">
           Manage your teams and matches from here.

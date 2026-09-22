@@ -197,7 +197,7 @@ export function ChallengeResponseActions({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmitChanges)}
-            className="space-y-4 rounded-lg border p-4"
+            className="space-y-4 rounded-lg border bg-card p-4 shadow-sm"
           >
             <p className="text-sm text-muted-foreground">
               {canRespond

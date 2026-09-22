@@ -54,11 +54,11 @@ function NavLinks({
             <Link
               href={link.href}
               className={cn(
-                "rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                "rounded-md text-sm transition-colors",
                 stacked ? "block px-3 py-2.5" : "px-2.5 py-1.5",
                 active
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground"
+                  ? "bg-primary font-medium text-primary-foreground"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
               aria-current={active ? "page" : undefined}
               onClick={onNavigate}
@@ -94,14 +94,14 @@ export function AppNavBar() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[hsl(215_32%_17%)] text-white">
       <div className="mx-auto flex min-h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-2">
           <Button
             type="button"
             variant="outline"
             size="icon"
-            className="md:hidden"
+            className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white md:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
@@ -109,7 +109,7 @@ export function AppNavBar() {
           >
             {menuOpen ? <X /> : <Menu />}
           </Button>
-          <Link href="/dashboard" className="shrink-0 text-sm font-semibold">
+          <Link href="/dashboard" className="shrink-0 text-sm font-semibold text-white">
             SportSphere
           </Link>
           <nav className="hidden md:block" aria-label="Main">
@@ -119,7 +119,12 @@ export function AppNavBar() {
         <div className="flex items-center gap-2">
           <NotificationBell />
           <form action="/logout" method="post" className="hidden sm:block">
-            <Button type="submit" variant="outline" size="sm">
+            <Button
+              type="submit"
+              variant="outline"
+              size="sm"
+              className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            >
               Log out
             </Button>
           </form>
@@ -129,7 +134,7 @@ export function AppNavBar() {
         <nav
           id="mobile-nav"
           aria-label="Main"
-          className="border-t bg-background px-4 py-3 md:hidden"
+          className="border-t border-white/10 bg-[hsl(215_32%_17%)] px-4 py-3 md:hidden"
         >
           <NavLinks
             pathname={pathname}
@@ -137,7 +142,11 @@ export function AppNavBar() {
             onNavigate={() => setMenuOpen(false)}
           />
           <form action="/logout" method="post" className="mt-3 sm:hidden">
-            <Button type="submit" variant="outline" className="w-full">
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            >
               Log out
             </Button>
           </form>

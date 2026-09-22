@@ -181,7 +181,7 @@ export function NotificationBell() {
         aria-controls={menuId}
         aria-busy={isLoading}
         onClick={handleToggle}
-        className="relative"
+        className="relative border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
       >
         <Bell aria-hidden="true" />
         {unreadCount > 0 ? (
@@ -195,7 +195,7 @@ export function NotificationBell() {
           id={menuId}
           role="dialog"
           aria-label="Recent notifications"
-          className="fixed inset-x-2 top-[3.75rem] z-50 overflow-hidden rounded-lg border bg-background shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80"
+          className="fixed inset-x-2 top-[3.75rem] z-50 overflow-hidden rounded-lg border bg-card text-card-foreground shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80"
         >
           <div className="border-b px-3 py-2">
             <p className="text-sm font-medium">Notifications</p>

@@ -38,7 +38,7 @@ function ConfirmationLine({
   progress: TeamProgress;
 }) {
   return (
-    <div className="rounded-lg border p-4">
+    <div className="rounded-lg border bg-card p-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-medium">{teamName}</p>
         <span className="text-sm text-muted-foreground">
